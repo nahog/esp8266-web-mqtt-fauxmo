@@ -13,6 +13,8 @@ Create a IoT device that can be controlled by Alexa, have a pretty local web ser
 
 ## Details
 
+Based on other of my projects: https://github.com/nahog/esp8266-web-mqtt-io-demo
+
 The code uses the flash file system to store the internal web page (using milligram and normalize as a pretty but light web framework). The internal web server is also Apple Web App compatible, this means that you can create a shortcut in an iOS device and it will behave as an app.
 
 The switch can be seen or controlled from the internal web page (that uses a lightweight local REST API that could also be called with simple json message) or from MQTT pubs and subs to Adafruit IO, this allow to link it to other things using the Adafruit IFTTT channel.
