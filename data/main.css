@@ -1,0 +1,49 @@
+.index-header {
+    text-align: center;
+    margin-top: 2em;
+}
+
+.index-id {
+    cursor: pointer;
+}
+
+.index-buttons {
+    text-align: center;
+}
+
+.index-id-input {
+    font-size:24px;
+    display:none;
+    text-align:center;
+    margin:auto;
+}
+
+.button-on,
+.button-on:hover,
+.button-on:focus {
+  background-color: #68ac3b;
+  border-color: #68ac3b;
+}
+
+.button-on.button-outline {
+    color: #68ac3b !important;
+}
+
+.button-off.button-outline {
+    color: #d9534f !important;
+}
+
+.button-off,
+.button-off:hover,
+.button-off:focus {
+  background-color: #d9534f;
+  border-color: #d9534f;
+}
+
+.hidden {
+    display: none;
+}
+
+.inline {
+    display: inline-block;
+}
