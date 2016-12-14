@@ -1,18 +1,20 @@
 #include <Arduino.h>
 #include <FS.h> 
-#include <fauxmoESP.h>
-#include <ESP8266WiFi.h>
+#include <fauxmoESP.h> // https://github.com/makermusings/fauxmo (Fauxmo commit 54e00be from GitHub)
+#include <ESP8266WiFi.h> // https://github.com/tzapu/WiFiManager (WiFiManager-0.12.0 from Arduino IDE Libraries)
 #include <WiFiManager.h> 
-#include <PubSubClient.h>
+#include <PubSubClient.h> // http://pubsubclient.knolleary.net/ (PubSubClient-2.6.0 from Arduino IDE Libraries)
 #include <ESP8266WebServer.h> 
 
-#include "credentials.h"
+#include "credentials.h" // Copy credentials.h.example to credentials.h and fill with your private data
+
+// Using latests Arduino/hardware/esp8266 tools from https://github.com/esp8266/Arduino (commit 7b32e6a)
 
 // Pin to name mapping
 // If you have your I/O connected to other pin, modify this accordingly
 #define SWITCH_PIN D5
 
-// Fauxmo (Faux Wemo) device name
+// Fauxmo (Faux Wemo) device name that can be discovered by Amazon Alexa
 #define FAUXMO_DEVICE_NAME "Christmas Lights"
 
 // Adafruit IO configuration. Replace {user} and {key} with your own
