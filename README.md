@@ -1,4 +1,4 @@
-# ESP8266 Web Server + MQTT I/O Demo
+# ESP8266 Fauxmo (WeMo Switch) + Web Server + MQTT
 
 ## Objective
 
