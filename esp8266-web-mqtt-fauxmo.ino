@@ -12,10 +12,7 @@
 
 // Pin to name mapping
 // If you have your I/O connected to other pin, modify this accordingly
-#define SWITCH_PIN D5
-
-// Fauxmo (Faux Wemo) device name that can be discovered by Amazon Alexa
-#define FAUXMO_DEVICE_NAME "Christmas Lights"
+#define SWITCH_PIN D1
 
 // Adafruit IO configuration. Replace {user} and {key} with your own
 #define AIO_SERVER "io.adafruit.com"
@@ -28,6 +25,7 @@
 // {username}/feeds/CC44DD-switch. No need to change these.
 #define AIO_BASE_FEED AIO_USERNAME "/feeds/"
 #define AIO_SWITCH_FEED "-switch"
+#define AIO_NAME_FEED "-wemo-name"
 
 // Serial speed for the console
 #define SERIAL_SPEED 115200
@@ -36,9 +34,11 @@
 WiFiClient espClient;
 PubSubClient client(espClient);
 String switchFeed;
+String nameFeed;
 
 // FauxmoESP
 fauxmoESP fauxmo;
+String fauxmoId;
 
 // Web server
 ESP8266WebServer server(80);
@@ -81,6 +81,15 @@ void publishSwitch(void) {
     Serial.print(switchFeed);
     Serial.print("]: ");
     Serial.println(switchStateString);
+}
+
+void publishName(void) {
+    client.publish(nameFeed.c_str(), fauxmoId.c_str());
+
+    Serial.print("Publish message [");
+    Serial.print(nameFeed);
+    Serial.print("]: ");
+    Serial.println(fauxmoId);
 }
 
 String getContentType(String filename) {
@@ -182,6 +191,7 @@ String setFeedId(const char * base, char * id, const char * feed) {
 
 void setupFeedIds(void) {
     switchFeed = setFeedId(AIO_BASE_FEED, chipId, AIO_SWITCH_FEED);
+    nameFeed = setFeedId(AIO_BASE_FEED, chipId, AIO_NAME_FEED);
 }
 
 void handleMqttConnection(void) {
@@ -193,6 +203,7 @@ void handleMqttConnection(void) {
             Serial.println("connected");
             // Publish current state
             publishSwitch();
+            publishName();
             // Resubscribe
             client.subscribe(switchFeed.c_str());
         } else {
@@ -234,7 +245,8 @@ void setup(void) {
     // Setup file system
     SPIFFS.begin();
 
-    // Setup chip id
+    // Setup chip id and fauxmo id
+    fauxmoId = chipId;
     if (!SPIFFS.exists("/id.json")) {
         File idFile = SPIFFS.open("/id.json", "w");
         if (!idFile) {
@@ -242,6 +254,13 @@ void setup(void) {
         }
         idFile.println(chipId);
         idFile.close();
+    }
+    else {
+        File chipIdForFauxmoId = SPIFFS.open("/id.json", "r");
+        if (chipIdForFauxmoId) {
+            fauxmoId = chipIdForFauxmoId.readString();
+        }
+        chipIdForFauxmoId.close();
     }
 
     // Set up HTTP server handles
@@ -264,6 +283,8 @@ void setup(void) {
         } else {
             idFile.println(server.arg("id"));
             server.send(200, "application/json", "true");
+            Serial.print("New id saved (this value will be used for the WeMo switch name after next reset): ");
+            Serial.println(server.arg("id"));
         }
         idFile.close();
     });
@@ -279,7 +300,9 @@ void setup(void) {
     Serial.println("HTTP server started");
 
     // Fauxmo
-    fauxmo.addDevice(FAUXMO_DEVICE_NAME);
+    Serial.print("WeMo switch name: ");
+    Serial.println(fauxmoId);
+    fauxmo.addDevice(fauxmoId.c_str());
     fauxmo.onMessage([](const char * device_name, bool state) {
         Serial.printf("New WeMo message for device %s, new state: %s", device_name, state ? "ON" : "OFF");
         if (state == 1) {
@@ -291,6 +314,6 @@ void setup(void) {
 }
 
 void loop() {
-    handleMqttConnection();handleMqttConnection();
+    handleMqttConnection();
     server.handleClient();
 }
